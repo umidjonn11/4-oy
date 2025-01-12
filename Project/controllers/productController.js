@@ -10,13 +10,11 @@ const writeDataToFile = (filename, data) => {
   fs.writeFileSync(path.join(__dirname, '../data', filename), JSON.stringify(data, null, 2));
 };
 
-// Get All Products
 const getAllProducts = (req, res) => {
   const products = readDataFromFile('products.json');
   res.json(products);
 };
 
-// Get Product by ID
 const getProductById = (req, res) => {
   const { productId } = req.params;
   const products = readDataFromFile('products.json');
@@ -29,7 +27,6 @@ const getProductById = (req, res) => {
   }
 };
 
-// Create Product
 const createProduct = (req, res) => {
   const { name, price, description, stock } = req.body;
 
@@ -41,7 +38,6 @@ const createProduct = (req, res) => {
   res.json(newProduct);
 };
 
-// Update Product
 const updateProduct = (req, res) => {
   const { productId } = req.params;
   const { name, price, description, stock } = req.body;
@@ -60,7 +56,6 @@ const updateProduct = (req, res) => {
   res.json(updatedProduct);
 };
 
-// Delete Product
 const deleteProduct = (req, res) => {
   const { productId } = req.params;
   const products = readDataFromFile('products.json');

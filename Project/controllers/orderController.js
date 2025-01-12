@@ -60,7 +60,6 @@ const updateOrder = (req, res) => {
   res.json(updatedOrder);
 };
 
-// Delete Order
 const deleteOrder = (req, res) => {
   const { orderId } = req.params;
   const orders = readDataFromFile('orders.json');

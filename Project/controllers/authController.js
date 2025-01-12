@@ -1,18 +1,15 @@
 const fs = require('fs');
 const path = require('path');
 
-// Helper function to read data from a JSON file
 const readDataFromFile = (filename) => {
   const data = fs.readFileSync(path.join(__dirname, '../data', filename), 'utf8');
   return JSON.parse(data);
 };
 
-// Helper function to write data to a JSON file
 const writeDataToFile = (filename, data) => {
   fs.writeFileSync(path.join(__dirname, '../data', filename), JSON.stringify(data, null, 2));
 };
 
-// Register
 const register = (req, res) => {
   const { name, email, password } = req.body;
 
