@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <style>
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+        background-color: #f7f9f8;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        justify-content: space-between;
+      }
+
+      #messages {
+        list-style-type: none;
+        margin: 0;
+        padding: 1rem;
+        overflow-y: auto;
+        flex-grow: 1;
+        background-color: #fff;
+        border-bottom: 2px solid #eee;
+      }
+
+      #messages > li {
+        padding: 1rem;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        background-color: #940b0b;
+        display: flex;
+        flex-direction: column;
+        word-wrap: break-word;
+      }
+
+      .message-content {
+        margin-top: 0.5rem;
+        font-size: 1rem;
+      }
+
+      .message-meta {
+        font-size: 0.8rem;
+        color: #a38d8d;
+      }
+
+      #form {
+        display: flex;
+        background: rgba(5, 5, 5, 0.1);
+        padding: 1rem;
+        position: sticky;
+        bottom: 0;
+        width: 100%;
+        box-sizing: border-box;
+        background-color: #fff;
+        border-top: 2px solid #eee;
+      }
+
+      #input {
+        border: 1px solid #ddd;
+        padding: 0.5rem;
+        border-radius: 20px;
+        flex-grow: 1;
+        margin-right: 10px;
+        font-size: 1rem;
+        outline: none;
+      }
+
+      #input:focus {
+        border-color: #5a1306;
+      }
+
+      button {
+        background-color: #0b0b0b;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        color: #8d0a0a;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 1rem;
+        outline: none;
+      }
+
+      button:hover {
+        background-color: #050505;
+      }
+
+      .username {
+        font-weight: bold;
+        color: #0c0c0c;
+      }
+
+      .timestamp {
+        font-style: italic;
+        color: #121111;
+      }
+
+      .system-message {
+        text-align: center;
+        font-size: 1.2rem;
+        color:rgb(13, 12, 12);
+        padding: 20px;
+        background-color: #8c051a;
+        border: 2px solid rgb(13, 13, 13);
+        border-radius: 10px;
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="welcome-container" class="system-message">
+      <p>Welcome to the chat! Please enter your username.</p>
+      <input type="text" id="username-input" placeholder= " Enter username" style="border-radius: 20px;height: 31px;background-color:#0b0b0b;text-align: center;color: #8d0a0a;border-color: white;text-decoration:wavy; "/>
+      <button id="set-username">Set Username</button>
+    </div>
+
+    <ul id="messages"></ul>
+
+    <form id="form" style="display:none;">
+      <input id="input" autocomplete="off" placeholder="Type a message..." />
+      <button>Send</button>
+    </form>
+
+    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+    <script>
+      const socket = io(); 
+
+      const form = document.getElementById("form");
+      const input = document.getElementById("input");
+      const messages = document.getElementById("messages");
+      const welcomeContainer = document.getElementById("welcome-container");
+      const usernameInput = document.getElementById("username-input");
+      const setUsernameButton = document.getElementById("set-username");
+      let username = "";
+
+      setUsernameButton.addEventListener("click", () => {
+        const enteredUsername = usernameInput.value.trim();
+        if (enteredUsername) {
+          username = enteredUsername;
+          socket.emit("set username", username); // Send the username to the server
+          welcomeContainer.style.display = "none";
+          form.style.display = "flex";
+        } else {
+          alert("Please enter a valid username.");
+        }
+      });
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        if (input.value) {
+          const time = new Date().toLocaleTimeString(); // Get the current time
+          const message = {
+            username: username,
+            content: input.value,
+            time: time,
+          };
+          socket.emit("chat message", message);
+          addMessageToUI(message);
+          input.value = "";
+        }
+      });
+
+      socket.on("chat message", (msg) => {
+        addMessageToUI(msg);
+      });
+
+      function addMessageToUI(msg) {
+        const item = document.createElement("li");
+        const timestamp = `<span class="timestamp">[${msg.time}]</span>`;
+        const content = `<span class="username">${msg.username}:</span> <span class="message-content">${msg.content}</span>`;
+        item.innerHTML = `${timestamp} ${content}`;
+        messages.appendChild(item);
+        window.scrollTo(0, document.body.scrollHeight);
+      }
+    </script>
+  </body>
+</html>
